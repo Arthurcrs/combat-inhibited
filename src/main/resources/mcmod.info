@@ -1,8 +1,8 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example description placeholder.",
+  "modid": "combatinhibited",
+  "name": "Combat Inhibited",
+  "description": "Applies the Inhibited status to the player when the player engages in combat.",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",

@@ -1,4 +1,4 @@
-package com.mahghuuuls.examplemod.proxy;
+package com.mahghuuuls.combatinhibited.proxy;
 
 public class CommonProxy {
 

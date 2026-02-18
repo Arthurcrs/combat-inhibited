@@ -1,10 +1,10 @@
-package com.mahghuuuls.examplemod.config;
+package com.mahghuuuls.combatinhibited.config;
 
-import com.mahghuuuls.examplemod.ExampleMod;
+import com.mahghuuuls.combatinhibited.CombatInhibited;
 
 import net.minecraftforge.common.config.Config;
 
-@Config(modid = ExampleMod.MOD_ID)
+@Config(modid = CombatInhibited.MOD_ID)
 public class ModConfig {
 
 //	@Config.Comment("Example config")

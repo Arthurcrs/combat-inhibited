@@ -8,13 +8,13 @@ buildscript {
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'eclipse'
+apply plugin: 'idea'
 apply plugin: 'maven-publish'
 apply plugin: 'java'
 
 version = '1.0.0'
-group = 'com.mahghuuuls.modid'
-archivesBaseName = 'modid'
+group = 'com.mahghuuuls.combatinhibited'
+archivesBaseName = 'combatinhibited'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -31,7 +31,7 @@ repositories {
 }
 
 dependencies {
-
+    deobfCompile "curse.maven:inhibited-880544:4721850"
 }
 
 // Manifest
