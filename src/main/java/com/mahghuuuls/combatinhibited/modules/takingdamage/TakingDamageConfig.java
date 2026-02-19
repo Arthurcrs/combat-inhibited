@@ -11,9 +11,9 @@ public class TakingDamageConfig {
     public int durationTicks = 300;
 
     @Config.Comment("Damage types that should NOT trigger the effect")
-    public String[] blackListDamageTypes = new String[0];
+    public String[] damageTypeBlackList = new String[0];
 
     @Config.Comment("Target entity IDs that should NOT trigger the effect (e.g., minecraft:zombie).")
-    public String[] targetBlacklist = new String[0];
+    public String[] entityBlackList = new String[0];
 
 }

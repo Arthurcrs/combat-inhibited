@@ -2,6 +2,8 @@ package com.mahghuuuls.combatinhibited;
 
 import com.mahghuuuls.combatinhibited.modules.dealingdamage.DealingDamageConfig;
 import com.mahghuuuls.combatinhibited.modules.dealingdamage.DealingDamageModule;
+import com.mahghuuuls.combatinhibited.modules.takingdamage.TakingDamageConfig;
+import com.mahghuuuls.combatinhibited.modules.takingdamage.TakingDamageModule;
 import com.mahghuuuls.combatinhibited.potioneffectmanagement.EffectApplier;
 import com.mahghuuuls.combatinhibited.potioneffectmanagement.EffectConfig;
 import net.minecraft.potion.Potion;
@@ -33,20 +35,36 @@ public class CombatInhibited {
             throw new RuntimeException("Inhibited potion reference is null.");
         }
 
+        //Dealing Damage Module
         DealingDamageConfig dealingDamageConfig = ModConfig.dealingDamageConfig;
-
         if (dealingDamageConfig.isEnabled) {
             int dealingDuration = dealingDamageConfig.durationTicks;
+
             EffectConfig dealingCfg = new EffectConfig(inhibitedPotion, dealingDuration, amplifier, showParticles);
             EffectApplier dealingApplier = new EffectApplier(dealingCfg);
 
-            HashSet<String> blackListDamageTypes = new HashSet<>(Arrays.asList(dealingDamageConfig.blackListDamageTypes));
-            HashSet<String> targetBlacklist = new HashSet<>(Arrays.asList(dealingDamageConfig.targetBlacklist));
+            HashSet<String> blackListDamageTypes = new HashSet<>(Arrays.asList(dealingDamageConfig.damageTypeBlackList));
+            HashSet<String> targetBlacklist = new HashSet<>(Arrays.asList(dealingDamageConfig.entityBlackList));
 
             DealingDamageModule dealingDamageModule = new DealingDamageModule(dealingApplier, blackListDamageTypes, targetBlacklist);
 
             MinecraftForge.EVENT_BUS.register(dealingDamageModule);
         }
 
+        //Taking Damage Module
+        TakingDamageConfig takingDamageConfig = ModConfig.takingDamageConfig;
+        if (takingDamageConfig.isEnabled) {
+            int takingDuration = takingDamageConfig.durationTicks;
+
+            EffectConfig takingCfg = new EffectConfig(inhibitedPotion, takingDuration, amplifier, showParticles);
+            EffectApplier takingApplier = new EffectApplier(takingCfg);
+
+            HashSet<String> takeBlacklistTypes = new HashSet<>(Arrays.asList(takingDamageConfig.damageTypeBlackList));
+            HashSet<String> attackerBlacklist = new HashSet<>(Arrays.asList(takingDamageConfig.entityBlackList));
+
+            TakingDamageModule takingDamageModule = new TakingDamageModule(takingApplier, takeBlacklistTypes, attackerBlacklist);
+
+            MinecraftForge.EVENT_BUS.register(takingDamageModule);
+        }
     }
 }
