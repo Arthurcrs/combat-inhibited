@@ -1,6 +1,5 @@
 package com.mahghuuuls.combatinhibited.potioneffectmanagement;
 
-import com.mahghuuuls.combatinhibited.general.InhibitedEffectDefaults;
 import net.minecraft.potion.Potion;
 
 public class EffectConfig {

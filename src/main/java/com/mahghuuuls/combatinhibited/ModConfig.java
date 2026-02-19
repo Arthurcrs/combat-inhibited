@@ -1,6 +1,5 @@
-package com.mahghuuuls.combatinhibited.general;
+package com.mahghuuuls.combatinhibited;
 
-import com.mahghuuuls.combatinhibited.CombatInhibited;
 import com.mahghuuuls.combatinhibited.modules.dealingdamage.DealingDamageConfig;
 import com.mahghuuuls.combatinhibited.modules.nearboss.NearBossConfig;
 import com.mahghuuuls.combatinhibited.modules.nearenemy.NearEnemyConfig;
