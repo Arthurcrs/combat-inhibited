@@ -23,9 +23,7 @@ public class EffectApplier {
         int amplifier = effectConfig.getAmplifier();
         boolean showParticles = effectConfig.isShowParticles();
 
-        if (effectConfig.getDurationTicks() <= 0){
-            return;
-        }
+        if (effectConfig.getDurationTicks() <= 0) return;
 
         PotionEffect effect = new PotionEffect(
                 potion,

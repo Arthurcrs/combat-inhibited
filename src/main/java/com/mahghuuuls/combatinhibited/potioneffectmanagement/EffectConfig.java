@@ -5,19 +5,21 @@ import net.minecraft.potion.Potion;
 
 public class EffectConfig {
 
-    private final Potion potion = InhibitedEffectDefaults.inhibitedPotion;
+    private final Potion potion;
     private final int durationTicks;
     private final int amplifier;
     private final boolean showParticles;
-    private final boolean showIcon;
 
     public EffectConfig(
-            int durationTicks
+            Potion potion,
+            int durationTicks,
+            int amplifier,
+            boolean showParticles
     ){
+        this.potion = potion;
         this.durationTicks = durationTicks;
-        this.amplifier = InhibitedEffectDefaults.amplifier;
-        this.showParticles = InhibitedEffectDefaults.showParticles;
-        this.showIcon = InhibitedEffectDefaults.showIcon;
+        this.amplifier = amplifier;
+        this.showParticles = showParticles;
     }
 
     public Potion getPotion(){
@@ -34,9 +36,5 @@ public class EffectConfig {
 
     public boolean isShowParticles() {
         return showParticles;
-    }
-
-    public boolean isShowIcon() {
-        return showIcon;
     }
 }
