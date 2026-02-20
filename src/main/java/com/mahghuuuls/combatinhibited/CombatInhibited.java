@@ -6,8 +6,8 @@ import com.mahghuuuls.combatinhibited.modules.nearboss.NearBossConfig;
 import com.mahghuuuls.combatinhibited.modules.nearboss.NearBossModule;
 import com.mahghuuuls.combatinhibited.modules.takingdamage.TakingDamageConfig;
 import com.mahghuuuls.combatinhibited.modules.takingdamage.TakingDamageModule;
-import com.mahghuuuls.combatinhibited.potioneffectmanagement.EffectApplier;
-import com.mahghuuuls.combatinhibited.potioneffectmanagement.EffectConfig;
+import com.mahghuuuls.combatinhibited.util.EffectApplier;
+import com.mahghuuuls.combatinhibited.util.EffectConfig;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -18,6 +18,8 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import java.util.Arrays;
 import java.util.HashSet;
+
+import static java.lang.Math.max;
 
 @Mod(modid = CombatInhibited.MOD_ID, name = CombatInhibited.NAME, version = CombatInhibited.VERSION, dependencies = CombatInhibited.DEPENDENCIES)
 public class CombatInhibited {
@@ -70,14 +72,16 @@ public class CombatInhibited {
         }
 
         //Near Boss Config
-        NearBossConfig cfg = ModConfig.nearBossConfig;
-        if (cfg.isEnabled) {
-            EffectConfig nearBossEffectCfg = new EffectConfig(inhibitedPotion, cfg.durationTicks, amplifier, showParticles);
+        NearBossConfig nearBossConfig = ModConfig.nearBossConfig;
+        if (nearBossConfig.isEnabled) {
+            EffectConfig nearBossEffectCfg = new EffectConfig(inhibitedPotion, nearBossConfig.durationTicks, amplifier, showParticles);
             EffectApplier nearBossApplier = new EffectApplier(nearBossEffectCfg);
 
-            HashSet<String> considerAsBoss = new HashSet<>(Arrays.asList(cfg.considerAsBoss));
+            HashSet<String> considerAsBoss = new HashSet<>(Arrays.asList(nearBossConfig.considerAsBoss));
 
-            MinecraftForge.EVENT_BUS.register(new NearBossModule(nearBossApplier, considerAsBoss));
+            int scanPeriodTicks = max(1, nearBossConfig.durationTicks - 1);
+
+            MinecraftForge.EVENT_BUS.register(new NearBossModule(nearBossApplier, considerAsBoss, scanPeriodTicks));
         }
     }
 }

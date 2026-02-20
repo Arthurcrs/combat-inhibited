@@ -8,10 +8,10 @@ public class NearBossConfig {
     public boolean isEnabled = true;
 
     @Config.Comment("Distance (blocks) from a boss to apply the effect.")
-    public double distanceBlocks = 16.0;
+    public double distanceBlocks = 80.0;
 
-    @Config.Comment("Duration of the effect while near a boss (ticks).")
-    public int durationTicks = 60;
+    @Config.Comment("How often refresh the effect when close to a configured boss.")
+    public int durationTicks = 300;
 
     @Config.Comment("Entity IDs treated as bosses.")
     public String[] considerAsBoss = new String[] {

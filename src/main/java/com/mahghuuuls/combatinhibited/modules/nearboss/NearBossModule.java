@@ -1,7 +1,9 @@
 package com.mahghuuuls.combatinhibited.modules.nearboss;
 
 import com.mahghuuuls.combatinhibited.ModConfig;
-import com.mahghuuuls.combatinhibited.potioneffectmanagement.EffectApplier;
+import com.mahghuuuls.combatinhibited.util.EffectApplier;
+import com.mahghuuuls.combatinhibited.util.EntityMatch;
+import com.mahghuuuls.combatinhibited.util.NearbyEntityScanner;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,10 +18,16 @@ public final class NearBossModule {
 
     private final EffectApplier applier;
     private final Set<String> considerAsBoss;
+    private final int scanPeriodTicks;
 
-    public NearBossModule(EffectApplier applier, Set<String> considerAsBoss) {
+    public NearBossModule(EffectApplier applier, Set<String> considerAsBoss, int scanPeriodTicks) {
         this.applier = applier;
         this.considerAsBoss = considerAsBoss;
+        if (scanPeriodTicks <= 0) {
+            this.scanPeriodTicks = scanPeriodTicks;
+        } else {
+            this.scanPeriodTicks = 1;
+        }
     }
 
     @SubscribeEvent
@@ -34,26 +42,19 @@ public final class NearBossModule {
 
         if (!ModConfig.nearBossConfig.isEnabled) return;
 
-        double r = ModConfig.nearBossConfig.distanceBlocks;
-        if (r <= 0) return;
+        double distanceBlocks = ModConfig.nearBossConfig.distanceBlocks;
+        if (distanceBlocks <= 0) return;
 
-        if ((player.ticksExisted % 10) != 0) return;
+        if ((player.ticksExisted % scanPeriodTicks) != 0) return;
 
         if (considerAsBoss == null || considerAsBoss.isEmpty()) return;
 
-        for (EntityLivingBase entity : world.getEntitiesWithinAABB(
-                EntityLivingBase.class,
-                player.getEntityBoundingBox().grow(r)
-        )) {
-            if (entity == null || entity.isDead || entity == player) continue;
-
-            ResourceLocation entityKey = EntityList.getKey(entity);
-
-            if (entityKey == null) continue;
-            if (!considerAsBoss.contains(entityKey.toString())) continue;
-
+        if (NearbyEntityScanner.anyMatch(player, distanceBlocks, new EntityMatch() {
+            @Override public boolean matches(EntityLivingBase entity, String id) {
+                return considerAsBoss.contains(id);
+            }
+        })) {
             applier.apply(player);
-            return;
         }
     }
 }

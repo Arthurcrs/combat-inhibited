@@ -1,6 +1,6 @@
 package com.mahghuuuls.combatinhibited.modules.dealingdamage;
 
-import com.mahghuuuls.combatinhibited.potioneffectmanagement.EffectApplier;
+import com.mahghuuuls.combatinhibited.util.EffectApplier;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
