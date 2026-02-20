@@ -10,23 +10,23 @@ import net.minecraftforge.common.config.Config;
 @Config(modid = CombatInhibited.MOD_ID)
 public final class ModConfig {
 
-    @Config.Name("Dealing damage")
-    @Config.Comment("Module settings")
+    @Config.Name("dealing_damage")
+    @Config.Comment("Applies Inhibited when the player deals damage.")
     public static final DealingDamageConfig dealingDamageConfig = new DealingDamageConfig();
 
-    @Config.Name("Taking damage")
-    @Config.Comment("Module settings")
+    @Config.Name("taking_damage")
+    @Config.Comment("Applies Inhibited when the player takes damage.")
     public static final TakingDamageConfig takingDamageConfig = new TakingDamageConfig();
 
-    @Config.Name("Being near a boss")
-    @Config.Comment("Module settings")
+    @Config.Name("near_boss")
+    @Config.Comment("Applies Inhibited while the player is within range of a configured boss entity.")
     public static final NearBossConfig nearBossConfig = new NearBossConfig();
 
-    @Config.Name("Being near a enemy")
-    @Config.Comment("Module settings")
+    @Config.Name("near_enemy")
+    @Config.Comment("Applies Inhibited while the player is within range of a configured enemy entity.")
     public static final NearEnemyConfig nearEnemyConfig = new NearEnemyConfig();
 
-    @Config.Name("Prevent expiring when near enemy")
-    @Config.Comment("Module settings")
+    @Config.Name("prevent_expiring")
+    @Config.Comment("Prevents the Inhibited effect from expiring under configured conditions.")
     public static final PreventExpiringConfig preventExpiringConfig = new PreventExpiringConfig();
 }
