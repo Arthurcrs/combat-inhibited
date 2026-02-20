@@ -2,6 +2,8 @@ package com.mahghuuuls.combatinhibited;
 
 import com.mahghuuuls.combatinhibited.modules.dealingdamage.DealingDamageConfig;
 import com.mahghuuuls.combatinhibited.modules.dealingdamage.DealingDamageModule;
+import com.mahghuuuls.combatinhibited.modules.nearboss.NearBossConfig;
+import com.mahghuuuls.combatinhibited.modules.nearboss.NearBossModule;
 import com.mahghuuuls.combatinhibited.modules.takingdamage.TakingDamageConfig;
 import com.mahghuuuls.combatinhibited.modules.takingdamage.TakingDamageModule;
 import com.mahghuuuls.combatinhibited.potioneffectmanagement.EffectApplier;
@@ -40,13 +42,13 @@ public class CombatInhibited {
         if (dealingDamageConfig.isEnabled) {
             int dealingDuration = dealingDamageConfig.durationTicks;
 
-            EffectConfig dealingCfg = new EffectConfig(inhibitedPotion, dealingDuration, amplifier, showParticles);
-            EffectApplier dealingApplier = new EffectApplier(dealingCfg);
+            EffectConfig dealingDamageEffectCfg = new EffectConfig(inhibitedPotion, dealingDuration, amplifier, showParticles);
+            EffectApplier dealingDamageApplier = new EffectApplier(dealingDamageEffectCfg);
 
             HashSet<String> blackListDamageTypes = new HashSet<>(Arrays.asList(dealingDamageConfig.damageTypeBlackList));
             HashSet<String> targetBlacklist = new HashSet<>(Arrays.asList(dealingDamageConfig.entityBlackList));
 
-            DealingDamageModule dealingDamageModule = new DealingDamageModule(dealingApplier, blackListDamageTypes, targetBlacklist);
+            DealingDamageModule dealingDamageModule = new DealingDamageModule(dealingDamageApplier, blackListDamageTypes, targetBlacklist);
 
             MinecraftForge.EVENT_BUS.register(dealingDamageModule);
         }
@@ -56,15 +58,26 @@ public class CombatInhibited {
         if (takingDamageConfig.isEnabled) {
             int takingDuration = takingDamageConfig.durationTicks;
 
-            EffectConfig takingCfg = new EffectConfig(inhibitedPotion, takingDuration, amplifier, showParticles);
-            EffectApplier takingApplier = new EffectApplier(takingCfg);
+            EffectConfig takingDamageEffectCfg = new EffectConfig(inhibitedPotion, takingDuration, amplifier, showParticles);
+            EffectApplier takingDamageApplier = new EffectApplier(takingDamageEffectCfg);
 
             HashSet<String> takeBlacklistTypes = new HashSet<>(Arrays.asList(takingDamageConfig.damageTypeBlackList));
             HashSet<String> attackerBlacklist = new HashSet<>(Arrays.asList(takingDamageConfig.entityBlackList));
 
-            TakingDamageModule takingDamageModule = new TakingDamageModule(takingApplier, takeBlacklistTypes, attackerBlacklist);
+            TakingDamageModule takingDamageModule = new TakingDamageModule(takingDamageApplier, takeBlacklistTypes, attackerBlacklist);
 
             MinecraftForge.EVENT_BUS.register(takingDamageModule);
+        }
+
+        //Near Boss Config
+        NearBossConfig cfg = ModConfig.nearBossConfig;
+        if (cfg.isEnabled) {
+            EffectConfig nearBossEffectCfg = new EffectConfig(inhibitedPotion, cfg.durationTicks, amplifier, showParticles);
+            EffectApplier nearBossApplier = new EffectApplier(nearBossEffectCfg);
+
+            HashSet<String> considerAsBoss = new HashSet<>(Arrays.asList(cfg.considerAsBoss));
+
+            MinecraftForge.EVENT_BUS.register(new NearBossModule(nearBossApplier, considerAsBoss));
         }
     }
 }
