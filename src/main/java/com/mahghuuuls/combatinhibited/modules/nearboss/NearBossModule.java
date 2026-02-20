@@ -23,7 +23,7 @@ public final class NearBossModule {
     public NearBossModule(EffectApplier applier, Set<String> considerAsBoss, int scanPeriodTicks) {
         this.applier = applier;
         this.considerAsBoss = considerAsBoss;
-        if (scanPeriodTicks <= 0) {
+        if (scanPeriodTicks > 0) {
             this.scanPeriodTicks = scanPeriodTicks;
         } else {
             this.scanPeriodTicks = 1;
