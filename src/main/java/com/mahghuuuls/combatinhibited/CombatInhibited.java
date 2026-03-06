@@ -6,8 +6,12 @@ import com.mahghuuuls.combatinhibited.modules.nearboss.NearBossConfig;
 import com.mahghuuuls.combatinhibited.modules.nearboss.NearBossModule;
 import com.mahghuuuls.combatinhibited.modules.takingdamage.TakingDamageConfig;
 import com.mahghuuuls.combatinhibited.modules.takingdamage.TakingDamageModule;
-import com.mahghuuuls.combatinhibited.util.EffectApplier;
-import com.mahghuuuls.combatinhibited.util.EffectConfig;
+import com.mahghuuuls.combatinhibited.util.effect.EffectApplier;
+import com.mahghuuuls.combatinhibited.util.effect.EffectConfig;
+import com.mahghuuuls.combatinhibited.util.entityfilter.EntityFilter;
+import com.mahghuuuls.combatinhibited.util.entityfilter.entityconditions.IsNotPlayerCondition;
+import com.mahghuuuls.combatinhibited.util.entityfilter.entityconditions.IsNotExcludedCondition;
+import com.mahghuuuls.combatinhibited.util.entityfilter.entityconditions.IsHostileCondition;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -18,6 +22,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 
 import static java.lang.Math.max;
 
@@ -32,12 +37,13 @@ public class CombatInhibited {
 	public void init(FMLInitializationEvent event) {
 
         Potion inhibitedPotion = ForgeRegistries.POTIONS.getValue(new ResourceLocation("inhibited", "inhibited"));
-        int amplifier = 0;
-        boolean showParticles = false;
 
         if (inhibitedPotion == null) {
             throw new RuntimeException("Inhibited potion reference is null.");
         }
+
+        int amplifier = 0;
+        boolean showParticles = false;
 
         //Dealing Damage Module
         DealingDamageConfig dealingDamageConfig = ModConfig.dealingDamageConfig;
@@ -48,10 +54,27 @@ public class CombatInhibited {
             EffectApplier dealingDamageApplier = new EffectApplier(dealingDamageEffectCfg);
 
             HashSet<String> blackListDamageTypes = new HashSet<>(Arrays.asList(dealingDamageConfig.damageTypeBlackList));
-            HashSet<String> targetBlacklist = new HashSet<>(Arrays.asList(dealingDamageConfig.entityBlackList));
 
-            DealingDamageModule dealingDamageModule = new DealingDamageModule(dealingDamageApplier, blackListDamageTypes, targetBlacklist);
+            EntityFilter entityFilter = new EntityFilter();
 
+            if (dealingDamageConfig.includeAll || dealingDamageConfig.includeIMob || dealingDamageConfig.includeTargetingPlayers) {
+                entityFilter.addCondition(new IsHostileCondition(dealingDamageConfig.includeAll, dealingDamageConfig.includeIMob, dealingDamageConfig.includeTargetingPlayers));
+            }
+
+            if (dealingDamageConfig.excludePlayers) {
+                entityFilter.addCondition(new IsNotPlayerCondition());
+            }
+
+            if (dealingDamageConfig.excludeList != null && dealingDamageConfig.excludeList.length > 0) {
+                Set<String> excludeList = new HashSet<>(Arrays.asList(dealingDamageConfig.excludeList));
+                entityFilter.addCondition(new IsNotExcludedCondition(excludeList));
+            }
+
+            if (dealingDamageConfig.allowList != null && dealingDamageConfig.allowList.length > 0) {
+                entityFilter.setAllowListOverride(new HashSet<>(Arrays.asList(dealingDamageConfig.allowList)));
+            }
+
+            DealingDamageModule dealingDamageModule = new DealingDamageModule(dealingDamageApplier, blackListDamageTypes, entityFilter);
             MinecraftForge.EVENT_BUS.register(dealingDamageModule);
         }
 

@@ -1,6 +1,9 @@
 package com.mahghuuuls.combatinhibited.modules.dealingdamage;
 
-import com.mahghuuuls.combatinhibited.util.EffectApplier;
+import com.mahghuuuls.combatinhibited.util.EntityUtils;
+import com.mahghuuuls.combatinhibited.util.effect.EffectApplier;
+import com.mahghuuuls.combatinhibited.util.entityfilter.EntityContext;
+import com.mahghuuuls.combatinhibited.util.entityfilter.EntityFilter;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,14 +19,14 @@ public final class DealingDamageModule {
 
     private final EffectApplier applier;
     private final Set<String> blacklistDamageTypes;
-    private final Set<String> blacklistEntityIds;
+    private final EntityFilter entityFilter;
 
     public DealingDamageModule(EffectApplier applier,
                                Set<String> blacklistDamageTypes,
-                               Set<String> blacklistEntityIds) {
+                               EntityFilter entityFilter) {
         this.applier = applier;
         this.blacklistDamageTypes = blacklistDamageTypes;
-        this.blacklistEntityIds = blacklistEntityIds;
+        this.entityFilter = entityFilter;
     }
 
     @SubscribeEvent
@@ -32,23 +35,18 @@ public final class DealingDamageModule {
 
         DamageSource damageSource = event.getSource();
         if (damageSource == null) return;
+        String damageType = damageSource.getDamageType();
+        if (blacklistDamageTypes != null && blacklistDamageTypes.contains(damageType)) return;
 
         Entity attacker = damageSource.getTrueSource();
         if (!(attacker instanceof EntityPlayer)) return;
-
-        String damageType = damageSource.getDamageType();
-        if (blacklistDamageTypes != null && blacklistDamageTypes.contains(damageType)) {
-            return;
-        }
-
         EntityLivingBase target = event.getEntityLiving();
-        if (blacklistEntityIds != null && !blacklistEntityIds.isEmpty()) {
-            ResourceLocation key = EntityList.getKey(target);
-            if (key != null && blacklistEntityIds.contains(key.toString())) {
-                return;
-            }
-        }
+        String targetEntityId = EntityUtils.getEntityId(target);
 
-        applier.apply((EntityPlayer) attacker);
+        EntityContext context = new EntityContext((EntityPlayer) attacker, target, targetEntityId);
+
+        if (entityFilter == null || entityFilter.passes(context)) {
+            applier.apply((EntityPlayer) attacker);
+        }
     }
 }

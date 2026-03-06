@@ -1,13 +1,11 @@
 package com.mahghuuuls.combatinhibited.modules.nearboss;
 
 import com.mahghuuuls.combatinhibited.ModConfig;
-import com.mahghuuuls.combatinhibited.util.EffectApplier;
-import com.mahghuuuls.combatinhibited.util.EntityMatch;
-import com.mahghuuuls.combatinhibited.util.NearbyEntityScanner;
-import net.minecraft.entity.EntityList;
+import com.mahghuuuls.combatinhibited.util.effect.EffectApplier;
+import com.mahghuuuls.combatinhibited.util.entityscanner.EntityMatch;
+import com.mahghuuuls.combatinhibited.util.entityscanner.NearbyEntityScanner;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;

@@ -1,4 +1,4 @@
-package com.mahghuuuls.combatinhibited.util;
+package com.mahghuuuls.combatinhibited.util.entityscanner;
 
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
