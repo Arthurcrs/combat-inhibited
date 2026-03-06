@@ -4,6 +4,8 @@ import net.minecraftforge.common.config.Config;
 
 public class DealingDamageConfig {
 
+    //TODO: Rename "the effect" to something like Inhibited
+
     @Config.Comment("Should dealing damage apply the effect?")
     public boolean isEnabled = true;
 

@@ -45,37 +45,37 @@ public class CombatInhibited {
         int amplifier = 0;
         boolean showParticles = false;
 
-        //Dealing Damage Module
-        DealingDamageConfig dealingDamageConfig = ModConfig.dealingDamageConfig;
-        if (dealingDamageConfig.isEnabled) {
-            int dealingDuration = dealingDamageConfig.durationTicks;
+        //Dealing Damage (DD) Module
+        DealingDamageConfig DDConfig = ModConfig.dealingDamageConfig;
+        if (DDConfig.isEnabled) {
+            int dealingDuration = DDConfig.durationTicks;
 
-            EffectConfig dealingDamageEffectCfg = new EffectConfig(inhibitedPotion, dealingDuration, amplifier, showParticles);
-            EffectApplier dealingDamageApplier = new EffectApplier(dealingDamageEffectCfg);
+            EffectConfig DDEffectCfg = new EffectConfig(inhibitedPotion, dealingDuration, amplifier, showParticles);
+            EffectApplier DDApplier = new EffectApplier(DDEffectCfg);
 
-            HashSet<String> blackListDamageTypes = new HashSet<>(Arrays.asList(dealingDamageConfig.damageTypeBlackList));
+            HashSet<String> blackListDamageTypes = new HashSet<>(Arrays.asList(DDConfig.damageTypeBlackList));
 
-            EntityFilter entityFilter = new EntityFilter();
+            EntityFilter DDEntityFilter = new EntityFilter();
 
-            if (dealingDamageConfig.includeAll || dealingDamageConfig.includeIMob || dealingDamageConfig.includeTargetingPlayers) {
-                entityFilter.addCondition(new IsHostileCondition(dealingDamageConfig.includeAll, dealingDamageConfig.includeIMob, dealingDamageConfig.includeTargetingPlayers));
+            if (DDConfig.includeAll || DDConfig.includeIMob || DDConfig.includeTargetingPlayers) {
+                DDEntityFilter.addCondition(new IsHostileCondition(DDConfig.includeAll, DDConfig.includeIMob, DDConfig.includeTargetingPlayers));
             }
 
-            if (dealingDamageConfig.excludePlayers) {
-                entityFilter.addCondition(new IsNotPlayerCondition());
+            if (DDConfig.excludePlayers) {
+                DDEntityFilter.addCondition(new IsNotPlayerCondition());
             }
 
-            if (dealingDamageConfig.excludeList != null && dealingDamageConfig.excludeList.length > 0) {
-                Set<String> excludeList = new HashSet<>(Arrays.asList(dealingDamageConfig.excludeList));
-                entityFilter.addCondition(new IsNotExcludedCondition(excludeList));
+            if (DDConfig.excludeList != null && DDConfig.excludeList.length > 0) {
+                Set<String> excludeList = new HashSet<>(Arrays.asList(DDConfig.excludeList));
+                DDEntityFilter.addCondition(new IsNotExcludedCondition(excludeList));
             }
 
-            if (dealingDamageConfig.allowList != null && dealingDamageConfig.allowList.length > 0) {
-                entityFilter.setAllowListOverride(new HashSet<>(Arrays.asList(dealingDamageConfig.allowList)));
+            if (DDConfig.allowList != null && DDConfig.allowList.length > 0) {
+                DDEntityFilter.setAllowListOverride(new HashSet<>(Arrays.asList(DDConfig.allowList)));
             }
 
-            DealingDamageModule dealingDamageModule = new DealingDamageModule(dealingDamageApplier, blackListDamageTypes, entityFilter);
-            MinecraftForge.EVENT_BUS.register(dealingDamageModule);
+            DealingDamageModule DDModule = new DealingDamageModule(DDApplier, blackListDamageTypes, DDEntityFilter);
+            MinecraftForge.EVENT_BUS.register(DDModule);
         }
 
         //Taking Damage Module
