@@ -1,6 +1,9 @@
 package com.mahghuuuls.combatinhibited.modules.takingdamage;
 
+import com.mahghuuuls.combatinhibited.util.EntityUtils;
 import com.mahghuuuls.combatinhibited.util.effect.EffectApplier;
+import com.mahghuuuls.combatinhibited.util.entityfilter.EntityContext;
+import com.mahghuuuls.combatinhibited.util.entityfilter.EntityFilter;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,39 +19,50 @@ public final class TakingDamageModule {
 
     private final EffectApplier applier;
     private final Set<String> blacklistDamageTypes;
-    private final Set<String> attackerBlacklistEntityIds;
+    private final EntityFilter entityFilter;
+    private final boolean includeNonEntityDamageSources;
 
     public TakingDamageModule(EffectApplier applier,
                               Set<String> blacklistDamageTypes,
-                              Set<String> attackerBlacklistEntityIds) {
+                              EntityFilter entityFilter,
+                              boolean includeNonEntityDamageSources) {
         this.applier = applier;
         this.blacklistDamageTypes = blacklistDamageTypes;
-        this.attackerBlacklistEntityIds = attackerBlacklistEntityIds;
+        this.entityFilter = entityFilter;
+        this.includeNonEntityDamageSources = includeNonEntityDamageSources;
     }
 
     @SubscribeEvent
     public void onLivingHurt(LivingHurtEvent event) {
         if (event.getEntity().world.isRemote) return;
 
-        EntityLivingBase victim = event.getEntityLiving();
+        Entity victim = event.getEntityLiving();
         if (!(victim instanceof EntityPlayer)) return;
+        EntityPlayer player = (EntityPlayer) victim;
 
-        DamageSource damageSource = event.getSource();
-        if (damageSource == null) return;
+        DamageSource src = event.getSource();
+        if (src == null) return;
 
-        String damageType = damageSource.getDamageType();
-        if (blacklistDamageTypes != null && blacklistDamageTypes.contains(damageType)) {
+        String damageType = src.getDamageType();
+        if (damageType != null && blacklistDamageTypes != null && blacklistDamageTypes.contains(damageType)) return;
+
+        Entity trueSource = src.getTrueSource();
+
+        // There is a living attacker -> use filter
+        if (trueSource instanceof EntityLivingBase) {
+            EntityLivingBase attacker = (EntityLivingBase) trueSource;
+            String attackerEntityId = EntityUtils.getEntityId(attacker);
+
+            EntityContext ctx = new EntityContext(player, attacker, attackerEntityId);
+            if (entityFilter == null || entityFilter.passes(ctx)) {
+                applier.apply(player);
+            }
             return;
         }
 
-        Entity attacker = damageSource.getTrueSource();
-        if (attacker != null && attackerBlacklistEntityIds != null && !attackerBlacklistEntityIds.isEmpty()) {
-            ResourceLocation key = EntityList.getKey(attacker);
-            if (key != null && attackerBlacklistEntityIds.contains(key.toString())) {
-                return;
-            }
+        // No living attacker
+        if (this.includeNonEntityDamageSources) {
+            applier.apply(player);
         }
-
-        applier.apply((EntityPlayer) victim);
     }
 }

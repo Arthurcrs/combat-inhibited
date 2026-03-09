@@ -48,9 +48,7 @@ public class CombatInhibited {
         //Dealing Damage (DD) Module
         DealingDamageConfig DDConfig = ModConfig.dealingDamageConfig;
         if (DDConfig.isEnabled) {
-            int dealingDuration = DDConfig.durationTicks;
-
-            EffectConfig DDEffectCfg = new EffectConfig(inhibitedPotion, dealingDuration, amplifier, showParticles);
+            EffectConfig DDEffectCfg = new EffectConfig(inhibitedPotion, DDConfig.durationTicks, amplifier, showParticles);
             EffectApplier DDApplier = new EffectApplier(DDEffectCfg);
 
             HashSet<String> blackListDamageTypes = new HashSet<>(Arrays.asList(DDConfig.damageTypeBlackList));
@@ -78,20 +76,35 @@ public class CombatInhibited {
             MinecraftForge.EVENT_BUS.register(DDModule);
         }
 
-        //Taking Damage Module
-        TakingDamageConfig takingDamageConfig = ModConfig.takingDamageConfig;
-        if (takingDamageConfig.isEnabled) {
-            int takingDuration = takingDamageConfig.durationTicks;
+        //Taking Damage (TD) Module
+        TakingDamageConfig TDConfig = ModConfig.takingDamageConfig;
+        if (TDConfig.isEnabled) {
+            EffectConfig TDEffectCfg = new EffectConfig(inhibitedPotion, TDConfig.durationTicks, amplifier, showParticles);
+            EffectApplier TDApplier = new EffectApplier(TDEffectCfg);
 
-            EffectConfig takingDamageEffectCfg = new EffectConfig(inhibitedPotion, takingDuration, amplifier, showParticles);
-            EffectApplier takingDamageApplier = new EffectApplier(takingDamageEffectCfg);
+            HashSet<String> blackListDamageTypes = new HashSet<>(Arrays.asList(TDConfig.damageTypeBlackList));
 
-            HashSet<String> takeBlacklistTypes = new HashSet<>(Arrays.asList(takingDamageConfig.damageTypeBlackList));
-            HashSet<String> attackerBlacklist = new HashSet<>(Arrays.asList(takingDamageConfig.entityBlackList));
+            EntityFilter TDEntityFilter = new EntityFilter();
 
-            TakingDamageModule takingDamageModule = new TakingDamageModule(takingDamageApplier, takeBlacklistTypes, attackerBlacklist);
+            if (TDConfig.includeAll || TDConfig.includeIMob || TDConfig.includeTargetingPlayers) {
+                TDEntityFilter.addCondition(new IsHostileCondition(TDConfig.includeAll, TDConfig.includeIMob, TDConfig.includeTargetingPlayers));
+            }
 
-            MinecraftForge.EVENT_BUS.register(takingDamageModule);
+            if (TDConfig.excludePlayers) {
+                TDEntityFilter.addCondition(new IsNotPlayerCondition());
+            }
+
+            if (TDConfig.excludeList != null && TDConfig.excludeList.length > 0) {
+                Set<String> excludeList = new HashSet<>(Arrays.asList(TDConfig.excludeList));
+                TDEntityFilter.addCondition(new IsNotExcludedCondition(excludeList));
+            }
+
+            if (TDConfig.allowList != null && TDConfig.allowList.length > 0) {
+                TDEntityFilter.setAllowListOverride(new HashSet<>(Arrays.asList(TDConfig.allowList)));
+            }
+
+            TakingDamageModule TDModule = new TakingDamageModule(TDApplier, blackListDamageTypes, TDEntityFilter, TDConfig.includeNonEntityDamageSources);
+            MinecraftForge.EVENT_BUS.register(TDModule);
         }
 
         //Near Boss Config

@@ -3,7 +3,9 @@ package com.mahghuuuls.combatinhibited.util.entityfilter.entityconditions;
 import com.mahghuuuls.combatinhibited.util.entityfilter.EntityCondition;
 import com.mahghuuuls.combatinhibited.util.entityfilter.EntityContext;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
+import net.minecraft.entity.player.EntityPlayer;
 
 public class IsHostileCondition implements EntityCondition {
 
@@ -24,24 +26,24 @@ public class IsHostileCondition implements EntityCondition {
             return true;
         }
 
-        if (includeIMob && entityIsImob(context)) {
+        if (includeIMob && entityIsIMob(context.entity)) {
             return true;
         }
 
-        if (includeTargetingPlayer && entityIsTargetingPlayer(context)) {
+        if (includeTargetingPlayer && entityIsTargetingAnyPlayer(context.entity)) {
             return true;
         }
 
         return false;
     }
 
-    private boolean entityIsImob(EntityContext context){
-        return context.entity instanceof IMob;
+    private boolean entityIsIMob(EntityLivingBase entity){
+        return entity instanceof IMob;
     }
 
-    private boolean entityIsTargetingPlayer(EntityContext context){
-        if (!(context.entity instanceof EntityLiving)) return false;
-        EntityLiving living = (EntityLiving) context.entity;
-        return living.getAttackTarget() == context.player;
+    private boolean entityIsTargetingAnyPlayer(EntityLivingBase entity) {
+        if (!(entity instanceof EntityLiving)) return false;
+        EntityLiving living = (EntityLiving) entity;
+        return living.getAttackTarget() instanceof EntityPlayer;
     }
 }
