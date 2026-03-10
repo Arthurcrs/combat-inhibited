@@ -28,16 +28,15 @@ import java.util.Set;
 
 @Mod(modid = CombatInhibited.MOD_ID, name = CombatInhibited.NAME, version = CombatInhibited.VERSION, dependencies = CombatInhibited.DEPENDENCIES)
 public class CombatInhibited {
-	public static final String MOD_ID = "combatinhibited";
-	public static final String NAME = "Combat Inhibited";
-	public static final String VERSION = "1.0.0";
-	public static final String DEPENDENCIES = "required-after:inhibited";
+    public static final String MOD_ID = "combatinhibited";
+    public static final String NAME = "Combat Inhibited";
+    public static final String VERSION = "1.0.0";
+    public static final String DEPENDENCIES = "required-after:inhibited";
 
-	@EventHandler
-	public void init(FMLInitializationEvent event) {
+    @EventHandler
+    public void init(FMLInitializationEvent event) {
 
         Potion inhibitedPotion = ForgeRegistries.POTIONS.getValue(new ResourceLocation("inhibited", "inhibited"));
-
         if (inhibitedPotion == null) {
             throw new RuntimeException("Inhibited potion reference is null.");
         }
@@ -45,65 +44,50 @@ public class CombatInhibited {
         int amplifier = 0;
         boolean showParticles = false;
 
-        //Dealing Damage (DD) Module
+        // Dealing Damage (DD) Module
         DealingDamageConfig DDConfig = ModConfig.dealingDamageConfig;
         if (DDConfig.isEnabled) {
             EffectConfig DDEffectCfg = new EffectConfig(inhibitedPotion, DDConfig.durationTicks, amplifier, showParticles);
             EffectApplier DDApplier = new EffectApplier(DDEffectCfg);
 
-            HashSet<String> blackListDamageTypes = new HashSet<>(Arrays.asList(DDConfig.damageTypeBlackList));
+            Set<String> blackListDamageTypes = new HashSet<>(Arrays.asList(DDConfig.damageTypeBlackList));
 
-            EntityFilter DDEntityFilter = new EntityFilter();
-
-            if (DDConfig.includeAll || DDConfig.includeIMob || DDConfig.includeTargetingPlayers) {
-                DDEntityFilter.addCondition(new IsHostileCondition(DDConfig.includeAll, DDConfig.includeIMob, DDConfig.includeTargetingPlayers));
-            }
-
-            if (DDConfig.excludePlayers) {
-                DDEntityFilter.addCondition(new IsNotPlayerCondition());
-            }
-
-            if (DDConfig.excludeList != null && DDConfig.excludeList.length > 0) {
-                Set<String> excludeList = new HashSet<>(Arrays.asList(DDConfig.excludeList));
-                DDEntityFilter.addCondition(new IsNotExcludedCondition(excludeList));
-            }
-
-            if (DDConfig.allowList != null && DDConfig.allowList.length > 0) {
-                DDEntityFilter.setAllowListOverride(new HashSet<>(Arrays.asList(DDConfig.allowList)));
-            }
+            EntityFilter DDEntityFilter = buildFilter(
+                    DDConfig.includeAll,
+                    DDConfig.includeIMob,
+                    DDConfig.includeTargetingPlayers,
+                    DDConfig.excludePlayers,
+                    DDConfig.excludeList,
+                    DDConfig.allowList
+            );
 
             DealingDamageModule DDModule = new DealingDamageModule(DDApplier, blackListDamageTypes, DDEntityFilter);
             MinecraftForge.EVENT_BUS.register(DDModule);
         }
 
-        //Taking Damage (TD) Module
+        // Taking Damage (TD) Module
         TakingDamageConfig TDConfig = ModConfig.takingDamageConfig;
         if (TDConfig.isEnabled) {
             EffectConfig TDEffectCfg = new EffectConfig(inhibitedPotion, TDConfig.durationTicks, amplifier, showParticles);
             EffectApplier TDApplier = new EffectApplier(TDEffectCfg);
 
-            HashSet<String> blackListDamageTypes = new HashSet<>(Arrays.asList(TDConfig.damageTypeBlackList));
+            Set<String> blackListDamageTypes = new HashSet<>(Arrays.asList(TDConfig.damageTypeBlackList));
 
-            EntityFilter TDEntityFilter = new EntityFilter();
+            EntityFilter TDEntityFilter = buildFilter(
+                    TDConfig.includeAll,
+                    TDConfig.includeIMob,
+                    TDConfig.includeTargetingPlayers,
+                    TDConfig.excludePlayers,
+                    TDConfig.excludeList,
+                    TDConfig.allowList
+            );
 
-            if (TDConfig.includeAll || TDConfig.includeIMob || TDConfig.includeTargetingPlayers) {
-                TDEntityFilter.addCondition(new IsHostileCondition(TDConfig.includeAll, TDConfig.includeIMob, TDConfig.includeTargetingPlayers));
-            }
-
-            if (TDConfig.excludePlayers) {
-                TDEntityFilter.addCondition(new IsNotPlayerCondition());
-            }
-
-            if (TDConfig.excludeList != null && TDConfig.excludeList.length > 0) {
-                Set<String> excludeList = new HashSet<>(Arrays.asList(TDConfig.excludeList));
-                TDEntityFilter.addCondition(new IsNotExcludedCondition(excludeList));
-            }
-
-            if (TDConfig.allowList != null && TDConfig.allowList.length > 0) {
-                TDEntityFilter.setAllowListOverride(new HashSet<>(Arrays.asList(TDConfig.allowList)));
-            }
-
-            TakingDamageModule TDModule = new TakingDamageModule(TDApplier, blackListDamageTypes, TDEntityFilter, TDConfig.includeNonEntityDamageSources);
+            TakingDamageModule TDModule = new TakingDamageModule(
+                    TDApplier,
+                    blackListDamageTypes,
+                    TDEntityFilter,
+                    TDConfig.includeNonEntityDamageSources
+            );
             MinecraftForge.EVENT_BUS.register(TDModule);
         }
 
@@ -114,24 +98,14 @@ public class CombatInhibited {
             EffectConfig NEEffectCfg = new EffectConfig(inhibitedPotion, NEConfig.durationTicks, amplifier, showParticles);
             EffectApplier NEApplier = new EffectApplier(NEEffectCfg);
 
-            EntityFilter NEEntityFilter = new EntityFilter();
-
-            if (NEConfig.includeAll || NEConfig.includeIMob || NEConfig.includeTargetingPlayers) {
-                NEEntityFilter.addCondition(new IsHostileCondition(NEConfig.includeAll, NEConfig.includeIMob, NEConfig.includeTargetingPlayers));
-            }
-
-            if (NEConfig.excludePlayers) {
-                NEEntityFilter.addCondition(new IsNotPlayerCondition());
-            }
-
-            if (NEConfig.excludeList != null && NEConfig.excludeList.length > 0) {
-                Set<String> excludeList = new HashSet<>(Arrays.asList(NEConfig.excludeList));
-                NEEntityFilter.addCondition(new IsNotExcludedCondition(excludeList));
-            }
-
-            if (NEConfig.allowList != null && NEConfig.allowList.length > 0) {
-                NEEntityFilter.setAllowListOverride(new HashSet<>(Arrays.asList(NEConfig.allowList)));
-            }
+            EntityFilter NEEntityFilter = buildFilter(
+                    NEConfig.includeAll,
+                    NEConfig.includeIMob,
+                    NEConfig.includeTargetingPlayers,
+                    NEConfig.excludePlayers,
+                    NEConfig.excludeList,
+                    NEConfig.allowList
+            );
 
             EntityScanner scanner = new NearbyEntityScanner();
 
@@ -148,5 +122,34 @@ public class CombatInhibited {
 
             MinecraftForge.EVENT_BUS.register(NEModule);
         }
+    }
+
+    private static EntityFilter buildFilter(boolean includeAll,
+                                            boolean includeIMob,
+                                            boolean includeTargetingPlayers,
+                                            boolean excludePlayers,
+                                            String[] excludeList,
+                                            String[] allowList) {
+
+        EntityFilter filter = new EntityFilter();
+
+        if (includeAll || includeIMob || includeTargetingPlayers) {
+            filter.addCondition(new IsHostileCondition(includeAll, includeIMob, includeTargetingPlayers));
+        }
+
+        if (excludePlayers) {
+            filter.addCondition(new IsNotPlayerCondition());
+        }
+
+        if (excludeList != null && excludeList.length > 0) {
+            Set<String> exclude = new HashSet<>(Arrays.asList(excludeList));
+            filter.addCondition(new IsNotExcludedCondition(exclude));
+        }
+
+        if (allowList != null && allowList.length > 0) {
+            filter.setAllowListOverride(new HashSet<>(Arrays.asList(allowList)));
+        }
+
+        return filter;
     }
 }

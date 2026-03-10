@@ -36,7 +36,7 @@ public final class NearEnemyModule {
         this.inhibitedPotion = inhibitedPotion;
         this.distanceBlocks = distanceBlocks;
         this.scanPeriodTicks = Math.max(1, scanPeriodTicks);
-        this.mode = mode;
+        this.mode = (mode == null ? Mode.APPLY_EFFECT : mode);
         this.refreshWhenRemainingAtMostTicks = Math.max(0, refreshWhenRemainingAtMostTicks);
     }
 
