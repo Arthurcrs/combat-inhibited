@@ -2,6 +2,8 @@ package com.mahghuuuls.combatinhibited;
 
 import com.mahghuuuls.combatinhibited.modules.dealingdamage.DealingDamageConfig;
 import com.mahghuuuls.combatinhibited.modules.dealingdamage.DealingDamageModule;
+import com.mahghuuuls.combatinhibited.modules.nearboss.NearBossConfig;
+import com.mahghuuuls.combatinhibited.modules.nearboss.NearBossModule;
 import com.mahghuuuls.combatinhibited.modules.nearenemy.NearEnemyConfig;
 import com.mahghuuuls.combatinhibited.modules.nearenemy.NearEnemyModule;
 import com.mahghuuuls.combatinhibited.modules.takingdamage.TakingDamageConfig;
@@ -121,6 +123,28 @@ public class CombatInhibited {
             );
 
             MinecraftForge.EVENT_BUS.register(NEModule);
+        }
+
+        // Near Boss (NB) Module
+        NearBossConfig NBConfig = ModConfig.nearBossConfig;
+        if (NBConfig.isEnabled) {
+
+            EffectConfig NBEffectCfg = new EffectConfig(inhibitedPotion, NBConfig.durationTicks, amplifier, showParticles);
+            EffectApplier NBApplier = new EffectApplier(NBEffectCfg);
+
+            Set<String> bossList = new HashSet<>(Arrays.asList(NBConfig.bossList));
+
+            EntityScanner scanner = new NearbyEntityScanner();
+
+            NearBossModule NBModule = new NearBossModule(
+                    scanner,
+                    NBApplier,
+                    bossList,
+                    NBConfig.distanceBlocks,
+                    Math.max(1, NBConfig.scanPeriodTicks)
+            );
+
+            MinecraftForge.EVENT_BUS.register(NBModule);
         }
     }
 
