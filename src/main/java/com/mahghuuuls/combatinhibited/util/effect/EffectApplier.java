@@ -7,9 +7,11 @@ import net.minecraft.potion.PotionEffect;
 public class EffectApplier {
 
     private final EffectConfig effectConfig;
+    private final ApplicationSource applicationSource;
 
-    public EffectApplier(EffectConfig effectConfig) {
+    public EffectApplier(EffectConfig effectConfig, ApplicationSource applicationSource) {
         this.effectConfig = effectConfig;
+        this.applicationSource = applicationSource;
     }
 
     public void apply(EntityPlayer player) {
@@ -34,5 +36,7 @@ public class EffectApplier {
         );
 
         player.addPotionEffect(effect);
+
+        EffectApplyBus.notifyApplied(player, applicationSource);
     }
 }

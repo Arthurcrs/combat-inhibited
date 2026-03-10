@@ -14,13 +14,16 @@ public class NearEnemyConfig {
     public double distanceBlocks = 12.0;
 
     @Config.Comment("How often to scan (ticks). 20 ticks = 1 second.")
-    public int scanPeriodTicks = 20;
+    public int scanPeriodTicks = 60;
 
     @Config.Comment("Duration in ticks applied/refreshed by this module.")
-    public int durationTicks = 100;
+    public int durationTicks = 300;
 
     @Config.Comment("PREVENT_EXPIRING only: only refresh if remaining duration is <= this value (ticks).")
     public int refreshWhenRemainingAtMostTicks = 100;
+
+    @Config.Comment("Maximum number of consecutive reapplications by this module while the player stays in range. -1 = unlimited.")
+    public int maxReapplications = 3;
 
     @Config.Comment("Include rule: treat any nearby living entity as matching.")
     public boolean includeAll = false;

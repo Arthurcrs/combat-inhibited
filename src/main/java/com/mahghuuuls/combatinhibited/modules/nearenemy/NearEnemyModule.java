@@ -1,6 +1,9 @@
 package com.mahghuuuls.combatinhibited.modules.nearenemy;
 
+import com.mahghuuuls.combatinhibited.util.effect.ApplicationSource;
 import com.mahghuuuls.combatinhibited.util.effect.EffectApplier;
+import com.mahghuuuls.combatinhibited.util.effect.EffectApplyBus;
+import com.mahghuuuls.combatinhibited.util.effect.ReapplicationLimiter;
 import com.mahghuuuls.combatinhibited.util.entityfilter.EntityContext;
 import com.mahghuuuls.combatinhibited.util.entityfilter.EntityFilter;
 import com.mahghuuuls.combatinhibited.util.entityscanner.EntityScanner;
@@ -9,6 +12,8 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+
+import java.util.UUID;
 
 public final class NearEnemyModule {
 
@@ -22,6 +27,8 @@ public final class NearEnemyModule {
     private final Mode mode;
     private final int refreshWhenRemainingAtMostTicks;
 
+    private final ReapplicationLimiter reapplicationLimiter;
+
     public NearEnemyModule(EntityScanner scanner,
                            EntityFilter filter,
                            EffectApplier applier,
@@ -29,15 +36,27 @@ public final class NearEnemyModule {
                            double distanceBlocks,
                            int scanPeriodTicks,
                            Mode mode,
-                           int refreshWhenRemainingAtMostTicks) {
+                           int refreshWhenRemainingAtMostTicks,
+                           int maxReapplications) {
+
         this.scanner = scanner;
         this.filter = filter;
         this.applier = applier;
         this.inhibitedPotion = inhibitedPotion;
+
         this.distanceBlocks = distanceBlocks;
         this.scanPeriodTicks = Math.max(1, scanPeriodTicks);
         this.mode = (mode == null ? Mode.APPLY_EFFECT : mode);
         this.refreshWhenRemainingAtMostTicks = Math.max(0, refreshWhenRemainingAtMostTicks);
+
+        this.reapplicationLimiter = new ReapplicationLimiter(maxReapplications);
+
+        EffectApplyBus.register((player, source) -> {
+            if (player == null) return;
+            if (source != ApplicationSource.NEAR_ENEMY) {
+                reapplicationLimiter.reset(player.getUniqueID());
+            }
+        });
     }
 
     @SubscribeEvent
@@ -48,18 +67,30 @@ public final class NearEnemyModule {
         if (player == null) return;
         if (player.world == null || player.world.isRemote) return;
 
+        if (distanceBlocks <= 0) return;
         if ((player.ticksExisted % scanPeriodTicks) != 0) return;
 
+        UUID playerId = player.getUniqueID();
+
         boolean found = scanner.anyMatch(player, distanceBlocks, (p, e, id) -> {
-            EntityContext context = new EntityContext(p, e, id);
-            return filter == null || filter.passes(context);
+            EntityContext ctx = new EntityContext(p, e, id);
+            return filter == null || filter.passes(ctx);
         });
 
-        if (!found) return;
+        if (!found) {
+            reapplicationLimiter.reset(playerId);
+            return;
+        }
+
+        if (!reapplicationLimiter.canApply(playerId)) {
+            return;
+        }
+
 
         // APPLY_EFFECT
         if (mode == Mode.APPLY_EFFECT) {
             applier.apply(player);
+            reapplicationLimiter.recordApplication(playerId);
             return;
         }
 
@@ -70,6 +101,7 @@ public final class NearEnemyModule {
 
         if (active.getDuration() <= refreshWhenRemainingAtMostTicks) {
             applier.apply(player);
+            reapplicationLimiter.recordApplication(playerId);
         }
     }
 }
