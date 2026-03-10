@@ -8,13 +8,13 @@ public class NearBossConfig {
     public boolean isEnabled = false;
 
     @Config.Comment("Scan radius in blocks.")
-    public double distanceBlocks = 16.0;
+    public double distanceBlocks = 24.0;
 
     @Config.Comment("How often to scan (ticks). 20 ticks = 1 second.")
-    public int scanPeriodTicks = 10;
+    public int scanPeriodTicks = 20;
 
     @Config.Comment("Duration in ticks applied/refreshed by this module.")
-    public int durationTicks = 60;
+    public int durationTicks = 100;
 
     @Config.Comment("Boss entity IDs (whitelist). Only these entities are treated as bosses. Format: \"modid:entity_name\".")
     public String[] bossList = new String[] {

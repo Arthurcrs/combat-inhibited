@@ -5,22 +5,22 @@ import net.minecraftforge.common.config.Config;
 public class NearEnemyConfig {
 
     @Config.Comment("Enable this module.")
-    public boolean isEnabled = false;
+    public boolean isEnabled = true;
 
     @Config.Comment("Behavior mode: APPLY_EFFECT or PREVENT_EXPIRING.")
-    public Mode mode = Mode.APPLY_EFFECT;
+    public Mode mode = Mode.PREVENT_EXPIRING;
 
     @Config.Comment("Scan radius in blocks.")
     public double distanceBlocks = 12.0;
 
     @Config.Comment("How often to scan (ticks). 20 ticks = 1 second.")
-    public int scanPeriodTicks = 10;
+    public int scanPeriodTicks = 20;
 
     @Config.Comment("Duration in ticks applied/refreshed by this module.")
-    public int durationTicks = 60;
+    public int durationTicks = 100;
 
     @Config.Comment("PREVENT_EXPIRING only: only refresh if remaining duration is <= this value (ticks).")
-    public int refreshWhenRemainingAtMostTicks = 20;
+    public int refreshWhenRemainingAtMostTicks = 100;
 
     @Config.Comment("Include rule: treat any nearby living entity as matching.")
     public boolean includeAll = false;
