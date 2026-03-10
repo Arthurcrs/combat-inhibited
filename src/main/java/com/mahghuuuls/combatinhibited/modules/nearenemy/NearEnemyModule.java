@@ -1,0 +1,75 @@
+package com.mahghuuuls.combatinhibited.modules.nearenemy;
+
+import com.mahghuuuls.combatinhibited.util.effect.EffectApplier;
+import com.mahghuuuls.combatinhibited.util.entityfilter.EntityContext;
+import com.mahghuuuls.combatinhibited.util.entityfilter.EntityFilter;
+import com.mahghuuuls.combatinhibited.util.entityscanner.EntityScanner;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+
+public final class NearEnemyModule {
+
+    private final EntityScanner scanner;
+    private final EntityFilter filter;
+    private final EffectApplier applier;
+    private final Potion inhibitedPotion;
+
+    private final double distanceBlocks;
+    private final int scanPeriodTicks;
+    private final Mode mode;
+    private final int refreshWhenRemainingAtMostTicks;
+
+    public NearEnemyModule(EntityScanner scanner,
+                           EntityFilter filter,
+                           EffectApplier applier,
+                           Potion inhibitedPotion,
+                           double distanceBlocks,
+                           int scanPeriodTicks,
+                           Mode mode,
+                           int refreshWhenRemainingAtMostTicks) {
+        this.scanner = scanner;
+        this.filter = filter;
+        this.applier = applier;
+        this.inhibitedPotion = inhibitedPotion;
+        this.distanceBlocks = distanceBlocks;
+        this.scanPeriodTicks = Math.max(1, scanPeriodTicks);
+        this.mode = mode;
+        this.refreshWhenRemainingAtMostTicks = Math.max(0, refreshWhenRemainingAtMostTicks);
+    }
+
+    @SubscribeEvent
+    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) return;
+
+        EntityPlayer player = event.player;
+        if (player == null) return;
+        if (player.world == null || player.world.isRemote) return;
+
+        if ((player.ticksExisted % scanPeriodTicks) != 0) return;
+
+        boolean found = scanner.anyMatch(player, distanceBlocks, (p, e, id) -> {
+            EntityContext context = new EntityContext(p, e, id);
+            return filter == null || filter.passes(context);
+        });
+
+        if (!found) return;
+
+        // APPLY_EFFECT
+        if (mode == Mode.APPLY_EFFECT) {
+            applier.apply(player);
+            return;
+        }
+
+        // PREVENT_EXPIRING
+        if (inhibitedPotion == null) return;
+        PotionEffect active = player.getActivePotionEffect(inhibitedPotion);
+        if (active == null) return;
+
+        if (active.getDuration() <= refreshWhenRemainingAtMostTicks) {
+            applier.apply(player);
+        }
+    }
+}

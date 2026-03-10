@@ -2,8 +2,8 @@ package com.mahghuuuls.combatinhibited;
 
 import com.mahghuuuls.combatinhibited.modules.dealingdamage.DealingDamageConfig;
 import com.mahghuuuls.combatinhibited.modules.dealingdamage.DealingDamageModule;
-import com.mahghuuuls.combatinhibited.modules.nearboss.NearBossConfig;
-import com.mahghuuuls.combatinhibited.modules.nearboss.NearBossModule;
+import com.mahghuuuls.combatinhibited.modules.nearenemy.NearEnemyConfig;
+import com.mahghuuuls.combatinhibited.modules.nearenemy.NearEnemyModule;
 import com.mahghuuuls.combatinhibited.modules.takingdamage.TakingDamageConfig;
 import com.mahghuuuls.combatinhibited.modules.takingdamage.TakingDamageModule;
 import com.mahghuuuls.combatinhibited.util.effect.EffectApplier;
@@ -12,6 +12,8 @@ import com.mahghuuuls.combatinhibited.util.entityfilter.EntityFilter;
 import com.mahghuuuls.combatinhibited.util.entityfilter.entityconditions.IsNotPlayerCondition;
 import com.mahghuuuls.combatinhibited.util.entityfilter.entityconditions.IsNotExcludedCondition;
 import com.mahghuuuls.combatinhibited.util.entityfilter.entityconditions.IsHostileCondition;
+import com.mahghuuuls.combatinhibited.util.entityscanner.EntityScanner;
+import com.mahghuuuls.combatinhibited.util.entityscanner.NearbyEntityScanner;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -23,8 +25,6 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
-import static java.lang.Math.max;
 
 @Mod(modid = CombatInhibited.MOD_ID, name = CombatInhibited.NAME, version = CombatInhibited.VERSION, dependencies = CombatInhibited.DEPENDENCIES)
 public class CombatInhibited {
@@ -107,17 +107,46 @@ public class CombatInhibited {
             MinecraftForge.EVENT_BUS.register(TDModule);
         }
 
-        //Near Boss Config
-        NearBossConfig nearBossConfig = ModConfig.nearBossConfig;
-        if (nearBossConfig.isEnabled) {
-            EffectConfig nearBossEffectCfg = new EffectConfig(inhibitedPotion, nearBossConfig.durationTicks, amplifier, showParticles);
-            EffectApplier nearBossApplier = new EffectApplier(nearBossEffectCfg);
+        // Near Enemy (NE) Module
+        NearEnemyConfig NEConfig = ModConfig.nearEnemyConfig;
+        if (NEConfig.isEnabled) {
 
-            HashSet<String> considerAsBoss = new HashSet<>(Arrays.asList(nearBossConfig.considerAsBoss));
+            EffectConfig NEEffectCfg = new EffectConfig(inhibitedPotion, NEConfig.durationTicks, amplifier, showParticles);
+            EffectApplier NEApplier = new EffectApplier(NEEffectCfg);
 
-            int scanPeriodTicks = max(1, nearBossConfig.durationTicks - 1);
+            EntityFilter NEEntityFilter = new EntityFilter();
 
-            MinecraftForge.EVENT_BUS.register(new NearBossModule(nearBossApplier, considerAsBoss, scanPeriodTicks));
+            if (NEConfig.includeAll || NEConfig.includeIMob || NEConfig.includeTargetingPlayers) {
+                NEEntityFilter.addCondition(new IsHostileCondition(NEConfig.includeAll, NEConfig.includeIMob, NEConfig.includeTargetingPlayers));
+            }
+
+            if (NEConfig.excludePlayers) {
+                NEEntityFilter.addCondition(new IsNotPlayerCondition());
+            }
+
+            if (NEConfig.excludeList != null && NEConfig.excludeList.length > 0) {
+                Set<String> excludeList = new HashSet<>(Arrays.asList(NEConfig.excludeList));
+                NEEntityFilter.addCondition(new IsNotExcludedCondition(excludeList));
+            }
+
+            if (NEConfig.allowList != null && NEConfig.allowList.length > 0) {
+                NEEntityFilter.setAllowListOverride(new HashSet<>(Arrays.asList(NEConfig.allowList)));
+            }
+
+            EntityScanner scanner = new NearbyEntityScanner();
+
+            NearEnemyModule NEModule = new NearEnemyModule(
+                    scanner,
+                    NEEntityFilter,
+                    NEApplier,
+                    inhibitedPotion,
+                    NEConfig.distanceBlocks,
+                    Math.max(1, NEConfig.scanPeriodTicks),
+                    NEConfig.mode,
+                    NEConfig.refreshWhenRemainingAtMostTicks
+            );
+
+            MinecraftForge.EVENT_BUS.register(NEModule);
         }
     }
 }

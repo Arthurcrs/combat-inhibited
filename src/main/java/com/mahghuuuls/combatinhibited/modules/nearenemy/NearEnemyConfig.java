@@ -4,10 +4,39 @@ import net.minecraftforge.common.config.Config;
 
 public class NearEnemyConfig {
 
-    @Config.Comment("Should be close to an enemy apply the effect?")
-    public boolean isEnabled = true;
+    @Config.Comment("Enable this module.")
+    public boolean isEnabled = false;
 
-    @Config.Comment("0: close to an enemy apply the effect or 1 should being close just prevent the effect from expiring?")
-    public int mode = 0;
+    @Config.Comment("Behavior mode: APPLY_EFFECT or PREVENT_EXPIRING.")
+    public Mode mode = Mode.APPLY_EFFECT;
 
+    @Config.Comment("Scan radius in blocks.")
+    public double distanceBlocks = 12.0;
+
+    @Config.Comment("How often to scan (ticks). 20 ticks = 1 second.")
+    public int scanPeriodTicks = 10;
+
+    @Config.Comment("Duration in ticks applied/refreshed by this module.")
+    public int durationTicks = 60;
+
+    @Config.Comment("PREVENT_EXPIRING only: only refresh if remaining duration is <= this value (ticks).")
+    public int refreshWhenRemainingAtMostTicks = 20;
+
+    @Config.Comment("Include rule: treat any nearby living entity as matching.")
+    public boolean includeAll = false;
+
+    @Config.Comment("Include rule: treat IMob entities as matching (most hostile mobs).")
+    public boolean includeIMob = true;
+
+    @Config.Comment("Include rule: treat entities targeting any player as matching (attack target is a player).")
+    public boolean includeTargetingPlayers = true;
+
+    @Config.Comment("Exclude players as nearby entities.")
+    public boolean excludePlayers = true;
+
+    @Config.Comment("Entity IDs that NEVER match, regardless of other rules. Format: \"modid:entity_name\".")
+    public String[] excludeList = new String[0];
+
+    @Config.Comment("Entity IDs that ALWAYS match, overriding include/exclude rules. Format: \"modid:entity_name\".")
+    public String[] allowList = new String[0];
 }

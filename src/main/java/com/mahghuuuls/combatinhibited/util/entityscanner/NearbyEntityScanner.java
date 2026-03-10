@@ -8,11 +8,10 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public final class NearbyEntityScanner {
+public final class NearbyEntityScanner implements EntityScanner {
 
-    private NearbyEntityScanner() {}
-
-    public static boolean anyMatch(EntityPlayer player, double distanceBlocks, EntityMatch match) {
+    @Override
+    public boolean anyMatch(EntityPlayer player, double distanceBlocks, EntityMatch match) {
         if (player == null || match == null) return false;
 
         World world = player.world;
@@ -28,11 +27,11 @@ public final class NearbyEntityScanner {
         for (EntityLivingBase entity : list) {
             if (entity == null || entity.isDead || entity == player) continue;
 
-            ResourceLocation entityKey = EntityList.getKey(entity);
-            if (entityKey == null) continue;
+            ResourceLocation key = EntityList.getKey(entity);
+            if (key == null) continue;
 
-            String id = entityKey.toString();
-            if (match.matches(entity, id)) return true;
+            String id = key.toString();
+            if (match.matches(player, entity, id)) return true;
         }
 
         return false;
