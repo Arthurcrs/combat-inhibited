@@ -11,7 +11,19 @@ public class TakingDamageConfig {
     public int durationTicks = 300;
 
     @Config.Comment("DamageSource types that should NOT trigger the effect (DamageSource#getDamageType). Example: \"fall\", \"lava\".")
-    public String[] damageTypeBlackList = new String[0];
+    public String[] damageTypeBlackList = new String[] {
+            "fall",
+            "lava",
+            "cactus",
+            "drown",
+            "inFire",
+            "onFire",
+            "hotFloor",
+            "inWall",
+            "starve",
+            "outOfWorld",
+            "lightningBolt"
+    };
 
     @Config.Comment("If true, damage with NO living attacker (fall, lava, cactus, etc.) can trigger the effect. If false, only damage caused by a living entity can trigger.")
     public boolean includeNonEntityDamageSources = true;
