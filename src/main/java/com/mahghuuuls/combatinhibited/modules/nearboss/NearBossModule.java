@@ -1,6 +1,6 @@
 package com.mahghuuuls.combatinhibited.modules.nearboss;
 
-import com.mahghuuuls.combatinhibited.util.effect.EffectApplier;
+import com.mahghuuuls.combatinhibited.util.effectapplier.EffectApplier;
 import com.mahghuuuls.combatinhibited.util.entityscanner.EntityScanner;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;

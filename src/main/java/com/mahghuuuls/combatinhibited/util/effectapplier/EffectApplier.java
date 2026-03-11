@@ -1,17 +1,23 @@
-package com.mahghuuuls.combatinhibited.util.effect;
+package com.mahghuuuls.combatinhibited.util.effectapplier;
 
+import com.mahghuuuls.combatinhibited.util.reaplicationlimiter.ApplicationSource;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.text.TextComponentString;
 
 public class EffectApplier {
 
     private final EffectConfig effectConfig;
     private final ApplicationSource applicationSource;
+    private final boolean debugMode;
 
-    public EffectApplier(EffectConfig effectConfig, ApplicationSource applicationSource) {
+    public EffectApplier(EffectConfig effectConfig,
+                         ApplicationSource applicationSource,
+                         boolean debugMode) {
         this.effectConfig = effectConfig;
         this.applicationSource = applicationSource;
+        this.debugMode = debugMode;
     }
 
     public void apply(EntityPlayer player) {
@@ -37,6 +43,20 @@ public class EffectApplier {
 
         player.addPotionEffect(effect);
 
+        // Debug message
+        if (debugMode && !player.world.isRemote) {
+            sendDebugMessage(player, durationTicks);
+        }
+
         EffectApplyBus.notifyApplied(player, applicationSource);
+    }
+
+    private void sendDebugMessage(EntityPlayer player, int durationTicks){
+        String source = (applicationSource == null ? "UNKNOWN" : applicationSource.name());
+        int seconds = durationTicks / 20;
+
+        player.sendMessage(new TextComponentString(
+                "[CombatInhibited] Applied Inhibited for " + durationTicks + "t (" + seconds + "s), source=" + source
+        ));
     }
 }

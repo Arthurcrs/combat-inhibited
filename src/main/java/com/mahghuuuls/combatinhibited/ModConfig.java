@@ -24,4 +24,8 @@ public final class ModConfig {
     @Config.Name("near_enemy")
     @Config.Comment("Applies Inhibited while the player is within range of a configured enemy entity.")
     public static final NearEnemyConfig nearEnemyConfig = new NearEnemyConfig();
+
+    @Config.Name("debug_mode")
+    @Config.Comment("If true, prints a chat message when Inhibited is applied (duration + source).")
+    public static boolean debugMode = false;
 }

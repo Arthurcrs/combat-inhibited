@@ -1,4 +1,4 @@
-package com.mahghuuuls.combatinhibited.util.effect;
+package com.mahghuuuls.combatinhibited.util.reaplicationlimiter;
 
 import java.util.HashMap;
 import java.util.Map;

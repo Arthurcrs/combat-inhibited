@@ -1,4 +1,4 @@
-package com.mahghuuuls.combatinhibited.util.effect;
+package com.mahghuuuls.combatinhibited.util.effectapplier;
 
 import net.minecraft.potion.Potion;
 

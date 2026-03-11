@@ -1,9 +1,9 @@
 package com.mahghuuuls.combatinhibited.modules.nearenemy;
 
-import com.mahghuuuls.combatinhibited.util.effect.ApplicationSource;
-import com.mahghuuuls.combatinhibited.util.effect.EffectApplier;
-import com.mahghuuuls.combatinhibited.util.effect.EffectApplyBus;
-import com.mahghuuuls.combatinhibited.util.effect.ReapplicationLimiter;
+import com.mahghuuuls.combatinhibited.util.reaplicationlimiter.ApplicationSource;
+import com.mahghuuuls.combatinhibited.util.effectapplier.EffectApplier;
+import com.mahghuuuls.combatinhibited.util.effectapplier.EffectApplyBus;
+import com.mahghuuuls.combatinhibited.util.reaplicationlimiter.ReapplicationLimiter;
 import com.mahghuuuls.combatinhibited.util.entityfilter.EntityContext;
 import com.mahghuuuls.combatinhibited.util.entityfilter.EntityFilter;
 import com.mahghuuuls.combatinhibited.util.entityscanner.EntityScanner;
@@ -46,7 +46,7 @@ public final class NearEnemyModule {
 
         this.distanceBlocks = distanceBlocks;
         this.scanPeriodTicks = Math.max(1, scanPeriodTicks);
-        this.mode = (mode == null ? Mode.APPLY_EFFECT : mode);
+        this.mode = (mode == null ? Mode.PREVENT_EXPIRING : mode);
         this.refreshWhenRemainingAtMostTicks = Math.max(0, refreshWhenRemainingAtMostTicks);
 
         this.reapplicationLimiter = new ReapplicationLimiter(maxReapplications);
@@ -73,8 +73,8 @@ public final class NearEnemyModule {
         UUID playerId = player.getUniqueID();
 
         boolean found = scanner.anyMatch(player, distanceBlocks, (p, e, id) -> {
-            EntityContext ctx = new EntityContext(p, e, id);
-            return filter == null || filter.passes(ctx);
+            EntityContext context = new EntityContext(p, e, id);
+            return filter == null || filter.passes(context);
         });
 
         if (!found) {
@@ -85,7 +85,6 @@ public final class NearEnemyModule {
         if (!reapplicationLimiter.canApply(playerId)) {
             return;
         }
-
 
         // APPLY_EFFECT
         if (mode == Mode.APPLY_EFFECT) {

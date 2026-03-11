@@ -8,9 +8,9 @@ import com.mahghuuuls.combatinhibited.modules.nearenemy.NearEnemyConfig;
 import com.mahghuuuls.combatinhibited.modules.nearenemy.NearEnemyModule;
 import com.mahghuuuls.combatinhibited.modules.takingdamage.TakingDamageConfig;
 import com.mahghuuuls.combatinhibited.modules.takingdamage.TakingDamageModule;
-import com.mahghuuuls.combatinhibited.util.effect.ApplicationSource;
-import com.mahghuuuls.combatinhibited.util.effect.EffectApplier;
-import com.mahghuuuls.combatinhibited.util.effect.EffectConfig;
+import com.mahghuuuls.combatinhibited.util.reaplicationlimiter.ApplicationSource;
+import com.mahghuuuls.combatinhibited.util.effectapplier.EffectApplier;
+import com.mahghuuuls.combatinhibited.util.effectapplier.EffectConfig;
 import com.mahghuuuls.combatinhibited.util.entityfilter.EntityFilter;
 import com.mahghuuuls.combatinhibited.util.entityfilter.entityconditions.IsNotPlayerCondition;
 import com.mahghuuuls.combatinhibited.util.entityfilter.entityconditions.IsNotExcludedCondition;
@@ -51,7 +51,7 @@ public class CombatInhibited {
         DealingDamageConfig DDConfig = ModConfig.dealingDamageConfig;
         if (DDConfig.isEnabled) {
             EffectConfig DDEffectCfg = new EffectConfig(inhibitedPotion, DDConfig.durationTicks, amplifier, showParticles);
-            EffectApplier DDApplier = new EffectApplier(DDEffectCfg, ApplicationSource.DEALING_DAMAGE);
+            EffectApplier DDApplier = new EffectApplier(DDEffectCfg, ApplicationSource.DEALING_DAMAGE, ModConfig.debugMode);
 
             Set<String> blackListDamageTypes = new HashSet<>(Arrays.asList(DDConfig.damageTypeBlackList));
 
@@ -72,7 +72,7 @@ public class CombatInhibited {
         TakingDamageConfig TDConfig = ModConfig.takingDamageConfig;
         if (TDConfig.isEnabled) {
             EffectConfig TDEffectCfg = new EffectConfig(inhibitedPotion, TDConfig.durationTicks, amplifier, showParticles);
-            EffectApplier TDApplier = new EffectApplier(TDEffectCfg, ApplicationSource.TAKING_DAMAGE);
+            EffectApplier TDApplier = new EffectApplier(TDEffectCfg, ApplicationSource.TAKING_DAMAGE, ModConfig.debugMode);
 
             Set<String> blackListDamageTypes = new HashSet<>(Arrays.asList(TDConfig.damageTypeBlackList));
 
@@ -99,7 +99,7 @@ public class CombatInhibited {
         if (NEConfig.isEnabled) {
 
             EffectConfig NEEffectCfg = new EffectConfig(inhibitedPotion, NEConfig.durationTicks, amplifier, showParticles);
-            EffectApplier NEApplier = new EffectApplier(NEEffectCfg, ApplicationSource.NEAR_ENEMY);
+            EffectApplier NEApplier = new EffectApplier(NEEffectCfg, ApplicationSource.NEAR_ENEMY, ModConfig.debugMode);
 
             EntityFilter NEEntityFilter = buildFilter(
                     NEConfig.includeAll,
@@ -132,7 +132,7 @@ public class CombatInhibited {
         if (NBConfig.isEnabled) {
 
             EffectConfig NBEffectCfg = new EffectConfig(inhibitedPotion, NBConfig.durationTicks, amplifier, showParticles);
-            EffectApplier NBApplier = new EffectApplier(NBEffectCfg, ApplicationSource.NEAR_BOSS);
+            EffectApplier NBApplier = new EffectApplier(NBEffectCfg, ApplicationSource.NEAR_BOSS, ModConfig.debugMode);
 
             Set<String> bossList = new HashSet<>(Arrays.asList(NBConfig.bossList));
 

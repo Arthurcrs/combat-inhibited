@@ -1,15 +1,13 @@
 package com.mahghuuuls.combatinhibited.modules.takingdamage;
 
 import com.mahghuuuls.combatinhibited.util.EntityUtils;
-import com.mahghuuuls.combatinhibited.util.effect.EffectApplier;
+import com.mahghuuuls.combatinhibited.util.effectapplier.EffectApplier;
 import com.mahghuuuls.combatinhibited.util.entityfilter.EntityContext;
 import com.mahghuuuls.combatinhibited.util.entityfilter.EntityFilter;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.entity.EntityList;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -48,7 +46,7 @@ public final class TakingDamageModule {
 
         Entity trueSource = src.getTrueSource();
 
-        // There is a living attacker -> use filter
+        // Living attacker
         if (trueSource instanceof EntityLivingBase) {
             EntityLivingBase attacker = (EntityLivingBase) trueSource;
             String attackerEntityId = EntityUtils.getEntityId(attacker);

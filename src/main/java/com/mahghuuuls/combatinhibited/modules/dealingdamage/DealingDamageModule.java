@@ -1,7 +1,7 @@
 package com.mahghuuuls.combatinhibited.modules.dealingdamage;
 
 import com.mahghuuuls.combatinhibited.util.EntityUtils;
-import com.mahghuuuls.combatinhibited.util.effect.EffectApplier;
+import com.mahghuuuls.combatinhibited.util.effectapplier.EffectApplier;
 import com.mahghuuuls.combatinhibited.util.entityfilter.EntityContext;
 import com.mahghuuuls.combatinhibited.util.entityfilter.EntityFilter;
 import net.minecraft.entity.Entity;
