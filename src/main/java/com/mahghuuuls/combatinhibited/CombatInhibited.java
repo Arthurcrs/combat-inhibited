@@ -33,7 +33,7 @@ import java.util.Set;
 public class CombatInhibited {
     public static final String MOD_ID = "combatinhibited";
     public static final String NAME = "Combat Inhibited";
-    public static final String VERSION = "1.0.0";
+    public static final String VERSION = "1.0.1";
     public static final String DEPENDENCIES = "required-after:inhibited";
 
     @EventHandler

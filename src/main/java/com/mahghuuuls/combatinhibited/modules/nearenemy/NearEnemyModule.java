@@ -1,5 +1,6 @@
 package com.mahghuuuls.combatinhibited.modules.nearenemy;
 
+import com.mahghuuuls.combatinhibited.util.SideUtil;
 import com.mahghuuuls.combatinhibited.util.reaplicationlimiter.ApplicationSource;
 import com.mahghuuuls.combatinhibited.util.effectapplier.EffectApplier;
 import com.mahghuuuls.combatinhibited.util.effectapplier.EffectApplyBus;
@@ -65,7 +66,7 @@ public final class NearEnemyModule {
 
         EntityPlayer player = event.player;
         if (player == null) return;
-        if (player.world == null || player.world.isRemote) return;
+        if (SideUtil.isRemote(player)) return;
 
         if (distanceBlocks <= 0) return;
         if ((player.ticksExisted % scanPeriodTicks) != 0) return;
