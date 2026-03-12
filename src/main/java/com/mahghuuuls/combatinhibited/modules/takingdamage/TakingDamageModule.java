@@ -1,6 +1,7 @@
 package com.mahghuuuls.combatinhibited.modules.takingdamage;
 
 import com.mahghuuuls.combatinhibited.util.EntityUtils;
+import com.mahghuuuls.combatinhibited.util.SideUtil;
 import com.mahghuuuls.combatinhibited.util.effectapplier.EffectApplier;
 import com.mahghuuuls.combatinhibited.util.entityfilter.EntityContext;
 import com.mahghuuuls.combatinhibited.util.entityfilter.EntityFilter;
@@ -32,7 +33,7 @@ public final class TakingDamageModule {
 
     @SubscribeEvent
     public void onLivingHurt(LivingHurtEvent event) {
-        if (event.getEntity().world.isRemote) return;
+        if (SideUtil.isRemote(event.getEntity())) return;
 
         Entity victim = event.getEntityLiving();
         if (!(victim instanceof EntityPlayer)) return;
